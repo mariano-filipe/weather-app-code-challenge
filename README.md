@@ -14,6 +14,7 @@ Desafio de programação para criar um app de consulta a condição climática d
 - [ ] Deve-se escrever ao menos um caso de teste para cada requisito funcional e cenário de erro
 - [ ] Deve-se escrever código apenas com a linguagem Typescript e utilizando tipagens adequadas, isto é não se deve usar `any`
 - [ ] Deve-se utilizar a biblioteca de componentes Material UI (MUI) para qualquer parte visual da aplicação (botões, inputs, boxes, etc.), o que inclui não apenas componentes (html), mas também toda parte de estilização (css)
+- [ ] Deve-se utilizar a [API da AccuWeather](https://developer.accuweather.com/) para obter dados climáticos de qualquer cidade no mundo
 
 ## Instruções para rodar o projeto
 Este desafio vem com uma aplicação já pré-configurada para evitar ter que montar todo o setup de uma aplicação react com typescript, MUI e vitest.

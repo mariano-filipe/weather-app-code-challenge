@@ -1,27 +1,17 @@
-import {
-  Box,
-  IconButton,
-  Input,
-  InputBase,
-  makeStyles,
-  Paper,
-  Typography,
-} from "@mui/material";
+import { IconButton, InputBase, Paper } from "@mui/material";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import React, { useState } from "react";
 
 interface SearchBarProps {
+  searchCity: string;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  searchCity: string;
-  setSearchCity: (city: string) => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
   onSubmit,
   onChange,
   searchCity,
-  setSearchCity,
 }) => {
   return (
     <Paper
@@ -34,7 +24,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         sx={{ ml: 1, flex: 1 }}
         value={searchCity}
         onChange={onChange}
-        inputProps={{ "aria-label": "teste" }}
+        inputProps={{ "aria-label": "searchBar" }}
         endAdornment={
           <IconButton type="submit" disabled={!searchCity}>
             <SearchOutlinedIcon />

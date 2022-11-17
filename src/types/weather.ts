@@ -1,6 +1,6 @@
 export interface IWeatherCity {
   locationKey: string;
-  location: { LocalizedName: string };
+  LocalizedName: string;
 }
 
 export interface IWeatherForecast {

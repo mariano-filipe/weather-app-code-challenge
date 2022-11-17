@@ -1,23 +1,34 @@
-import { Box, CircularProgress, Typography } from "@mui/material";
+import React from "react";
+import {
+  Autocomplete,
+  Box,
+  CircularProgress,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useEffect, useState } from "react";
-import Error from "../components/Error";
 import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
+import Status from "../components/Status";
 import WeatherCard from "../components/WeatherCard";
 import { IWeatherCity, IWeatherForecast } from "../types/weather";
+import { convertToCelsius } from "../functions/Index";
+import NewHeader from "../components/NewHeader";
+
 const PageWeather = () => {
-  // const apiKey = "4oBnf4JDnnXsCa74kvwxd4SRq36lGUo0";
-  const apiKey = "Er2lGDs6rcMDPVU9ffZPoTucbbG9rlxv";
+  const apiKey = "4oBnf4JDnnXsCa74kvwxd4SRq36lGUo0";
+  // const apiKey = "Er2lGDs6rcMDPVU9ffZPoTucbbG9rlxv";
   const [searchCity, setSearchCity] = useState("");
-  // const [locationKey, setLocationKey] = useState("");
-  // const [location, setLocation] = useState<string | []>([]);
+  const [locationKey, setLocationKey] = useState("");
+  const [location, setLocation] = useState<IWeatherCity>();
   const [forecast, setForecast] = useState<IWeatherForecast | null>();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  const [locationData, setLocationData] = useState<IWeatherCity>({
-    locationKey: "",
-    location: { LocalizedName: "" },
-  });
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  // const [locationData, setLocationData] = useState<IWeatherCity>({
+  //   locationKey: "",p
+  //   location: { LocalizedName: "" },
+  // });
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchCity(event?.target.value);
@@ -25,26 +36,29 @@ const PageWeather = () => {
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!searchCity) return;
-    let response;
+    setLoading(true);
+    // if (!searchCity) return;
     const apiWeatherURL = `http://dataservice.accuweather.com/locations/v1/cities/search?apikey=${apiKey}&q=${searchCity}&language=pt-br&details=true`;
     try {
-      response = await fetch(apiWeatherURL);
+      let response = await fetch(apiWeatherURL);
       const data = await response.json();
       if (!data || data.length === 0) {
         setError(true);
-        setLoading(false);
+        // abre a snackbar
+        setOpenSnackbar(true);
+        return;
       }
-      // setLocation(data[0]);
-      setLocationData({ locationKey: data[0]?.Key, location: data[0] });
+      setLocation(data[0]);
+      setLocationKey(data[0]?.Key);
       setSearchCity("");
-      console.log("data", data);
+      setError(false);
       setLoading(false);
+
       return data[0];
     } catch (error) {
       setError(true);
-      setLoading(false);
-      console.log("error", error);
+      setOpenSnackbar(true);
+      console.log(error);
     }
   };
 
@@ -52,58 +66,52 @@ const PageWeather = () => {
     setForecast(null);
     setLoading(true);
     const getlocationForecasts = async () => {
-      const apiWeatherURL = `http://dataservice.accuweather.com/forecasts/v1/daily/5day/${locationData.locationKey}?apikey=${apiKey}&language=pt-br&details=true`;
-      if (!locationData.locationKey) return null;
+      const apiWeatherURL = `http://dataservice.accuweather.com/forecasts/v1/daily/5day/${locationKey}?apikey=${apiKey}&language=pt-br&details=true`;
+      if (!locationKey) return null;
       try {
         const response = await fetch(apiWeatherURL);
         const data = await response.json();
         setForecast(data.DailyForecasts);
         setLoading(false);
-      } catch (error: any) {
+        return data.DailyForecasts;
+      } catch (error) {
         setError(true);
-        setLoading(false);
-        console.log("er", error);
+        setOpenSnackbar(true);
+        console.log("error", error);
       }
     };
     getlocationForecasts();
-  }, [locationData.locationKey]);
-
-  const convertToCelsius = (fahrenheit: number) => {
-    return Math.round((fahrenheit - 32) / 1.8);
-  };
+  }, [locationKey]);
 
   return (
-    <Box>
-      <Header />
+    <>
+      <NewHeader />
       <Box
+        id="content"
         display="flex"
         flexDirection="column"
         justifyContent="center"
         alignItems="center"
-        height="100vh"
+        minHeight="100%"
         gap={5}
-        bgcolor="#DCDCDC"
       >
-        {!forecast && loading && <CircularProgress />}
-
         <SearchBar
           onSubmit={onSubmit}
           onChange={onChange}
           searchCity={searchCity}
-          setSearchCity={setSearchCity}
         />
-        <Typography sx={{ fontWeight: "light" }} variant="h4">
-          {locationData.location?.LocalizedName}
+        <Typography sx={{ fontWeight: "light" }}>
+          {location?.LocalizedName}
         </Typography>
         <Box
           display="flex"
           width="100%"
           justifyContent="space-evenly"
           flexWrap="wrap"
+          gap="30px"
         >
           {forecast &&
-            Object.entries(forecast).map(([index, item]: any) => {
-              console.log("item", item, "index", index);
+            Object.entries(forecast).map(([index, item]) => {
               const date = new Date(item.Date).toLocaleDateString("pt-br", {
                 day: "numeric",
                 month: "short",
@@ -122,14 +130,18 @@ const PageWeather = () => {
               );
             })}
         </Box>
+        {error && (
+          <Status
+            title="Tente novamente"
+            message="Cidade não encontrada. Tente Novamente"
+            severity="warning"
+            onClose={() => setOpenSnackbar(false)}
+            setOpenSnackbar={setOpenSnackbar}
+            openSnackbar={openSnackbar}
+          />
+        )}
       </Box>
-      {error && (
-        <Error
-          severity="error"
-          message="Opa, deu um erro aqui. Vamos resolver, beleza?"
-        />
-      )}
-    </Box>
+    </>
   );
 };
 

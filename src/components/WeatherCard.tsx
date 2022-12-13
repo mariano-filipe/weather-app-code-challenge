@@ -18,7 +18,16 @@ const WeatherCard: React.FC<WeatherDataProps> = ({
   description,
 }) => {
   return (
-    <Card sx={{ width: 243 }}>
+    <Card
+      sx={{
+        width: 243,
+        background: `rgba(62, 155, 206, 0.3)`,
+        borderRadius: "16px",
+        boxShadow: " 0 4px 30px rgba(0, 0, 0, 0.1)",
+        backdropFilter: "blur(3.4px)",
+        border: "1px solid rgba(62, 155, 206, 0.15)",
+      }}
+    >
       <Box
         display="flex"
         alignItems="center"
@@ -26,6 +35,13 @@ const WeatherCard: React.FC<WeatherDataProps> = ({
         height="140px"
         bgcolor="#B2CEDE"
         textAlign="center"
+        sx={{
+          background: `rgba(255, 255, 255, 0.11)`,
+          borderRadius: "16px",
+          boxShadow: " 0 4px 30px rgba(0, 0, 0, 0.1)",
+          backdropFilter: "blur(3.4px)",
+          border: "1px solid rgba(255, 255, 255, 0.15)",
+        }}
       >
         <Typography
           sx={{ fontWeight: "light", position: "absolute" }}
@@ -47,7 +63,7 @@ const WeatherCard: React.FC<WeatherDataProps> = ({
             {description}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {maximum}° / {minimum}°
+            Máxima de {maximum}° / Minimo de {minimum}°
           </Typography>
         </Box>
       </CardContent>

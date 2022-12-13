@@ -5,25 +5,38 @@ import {
   Collapse,
   Snackbar,
 } from "@mui/material";
+import { IError } from "../types/weather";
 
 interface Props {
-  message: string;
   title: string;
   openSnackbar: boolean;
   setOpenSnackbar: (open: boolean) => void;
   onClose: () => void;
+  details: any;
 }
 
 type IMuiProps = Pick<AlertProps, "severity">;
 type IStatusProps = IMuiProps & Props;
 
 const Status: React.FC<IStatusProps> = ({
-  message,
-  severity,
   title,
   openSnackbar,
   onClose,
+  details,
 }) => {
+  console.log("details", details);
+
+  const showMessage = () => {
+    if (!details.errorResponse) {
+      return "Cidade não encotrada. Tente novamente.";
+    }
+    if (details.errorResponse.status === 401) {
+      return "Erro interno. Tente Novamente mais tarde.";
+    }
+    return "Error";
+  };
+  console.log("error", details.errorResponse);
+
   return (
     <>
       <Snackbar
@@ -34,11 +47,12 @@ const Status: React.FC<IStatusProps> = ({
           <Alert
             sx={{ borderRadius: "32px", width: "438px" }}
             icon={false}
-            severity={severity}
+            severity={details.severity}
             onClose={onClose}
           >
             <AlertTitle>{title}</AlertTitle>
-            {message}
+            {showMessage()}
+            {/* {message} */}
           </Alert>
         </Collapse>
       </Snackbar>
